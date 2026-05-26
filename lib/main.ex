@@ -16,7 +16,7 @@ defmodule Server do
     {:ok, socket} =
       :gen_udp.open(2053, [:binary, active: false, reuseaddr: true, ip: {127, 0, 0, 1}])
 
-    # loop(socket)
+    loop(socket)
   end
 
   defp loop(socket) do
