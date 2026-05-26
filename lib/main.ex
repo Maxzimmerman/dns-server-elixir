@@ -13,7 +13,9 @@ defmodule Server do
     #
     # # Since the tester restarts your program quite often, setting SO_REUSEADDR
     # # ensures that we don't run into 'Address already in use' errors
-    # {:ok, socket} = :gen_udp.open(2053, [:binary, active: false, reuseaddr: true, ip: {127, 0, 0, 1}])
+    {:ok, socket} =
+      :gen_udp.open(2053, [:binary, active: false, reuseaddr: true, ip: {127, 0, 0, 1}])
+
     # loop(socket)
   end
 
@@ -23,6 +25,7 @@ defmodule Server do
         response = ""
         :gen_udp.send(socket, address, port, response)
         loop(socket)
+
       {:error, reason} ->
         IO.puts("Error receiving data: #{inspect(reason)}")
     end
