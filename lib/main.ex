@@ -20,6 +20,23 @@ defmodule Server do
         <<id::16, qr::1, opcode::4, aa::1, tc::1, rd::1, ra::1, z::3, rcode::4, ancount::16,
           nscount::16, arcount::16, rest::binary>> = data
 
+        header_map = %{
+          id: id,
+          qr: qr,
+          opcode: opcode,
+          aa: aa,
+          tc: tc,
+          rd: rd,
+          ra: ra,
+          z: z,
+          rcode: rcode,
+          ancount: ancount,
+          nscount: nscount,
+          arcount: arcount
+        }
+
+        IO.inspect(header_map)
+
         IO.inspect(id, label: "TEST id")
         message = build_message(header(), question(), answer())
 
