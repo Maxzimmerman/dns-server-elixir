@@ -35,6 +35,6 @@ defmodule MessageHead do
 
   def to_binary_str(%MessageHead{} = head),
     do:
-      <<head.id::4, head.qr::1, head.opcode::4, head.aa::1, head.tc::1, head.rd::1, head.ra::1,
+      <<head.id::16, head.qr::1, head.opcode::4, head.aa::1, head.tc::1, head.rd::1, head.ra::1,
         head.z::3, head.rcode::4, head.ancount::16, head.nscount::16, head.arcount::16>>
 end
