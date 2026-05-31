@@ -23,7 +23,7 @@ defmodule Server do
 
         message = build_message(header, question(), answer())
 
-        response = message.header <> message.question <> message.answer
+        response = MessageHead.to_binary_str(message.header) <> message.question <> message.answer
 
         IO.inspect(response, label: "TS")
         :gen_udp.send(socket, address, port, response)
