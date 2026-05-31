@@ -15,9 +15,7 @@ defmodule Server do
   defp loop(socket) do
     case :gen_udp.recv(socket, 512) do
       {:ok, {address, port, data}} ->
-        message = build_message(header(), question())
-        IO.inspect(data, label: "TEST as binaries")
-        IO.inspect(data, binaries: :as_strings, label: "TEST as strings")
+        message = build_message(header(), question(), answer())
 
         response = message.header <> message.question
 
@@ -30,8 +28,8 @@ defmodule Server do
     end
   end
 
-  defp build_message(header, question) do
-    %Message{header: header, question: question}
+  defp build_message(header, question, answer) do
+    %Message{header: header, question: question, answer: answer}
   end
 
   defp header,
@@ -39,6 +37,9 @@ defmodule Server do
 
   defp question,
     do: <<12, "codecrafters", 2, "io", 0, 1::16, 1::16>>
+
+  defp answer,
+    do: nil
 
   def main(_args) do
     {:ok, _pid} = Application.ensure_all_started(:codecrafters_dns_server)
