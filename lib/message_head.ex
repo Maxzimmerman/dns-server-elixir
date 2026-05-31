@@ -1,5 +1,5 @@
 defmodule MessageHead do
-  defstruct [:id, :qr, :opcode, :aa, :tc, :rd, :ra, :z, :rcode, :acount, :nscount, :arcount]
+  defstruct [:id, :qr, :opcode, :aa, :tc, :rd, :ra, :z, :rcode, :ancount, :nscount, :arcount]
 
   def to_struct(input_map) do
     %MessageHead{
@@ -12,7 +12,7 @@ defmodule MessageHead do
       ra: input_map["ra"],
       z: input_map[""],
       rcode: input_map["rcode"],
-      acount: input_map["account"],
+      ancount: input_map["ancount"],
       nscount: input_map["nscount"],
       arcount: input_map["arcount"]
     }

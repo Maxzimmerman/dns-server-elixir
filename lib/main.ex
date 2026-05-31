@@ -18,7 +18,7 @@ defmodule Server do
         IO.inspect(data, label: "TEST DATA")
 
         <<id::16, qr::1, opcode::4, aa::1, tc::1, rd::1, ra::1, z::3, rcode::4, ancount::16,
-          nscount::16, arcount::16, rest::binary>> = data
+          nscount::16, arcount::16, _rest::binary>> = data
 
         header_map = %{
           id: id,
@@ -36,6 +36,7 @@ defmodule Server do
         }
 
         IO.inspect(header_map)
+        IO.inspect(MessageHead.to_struct(header_map), label: "TST STRUCT")
 
         IO.inspect(id, label: "TEST id")
         message = build_message(header(), question(), answer())
