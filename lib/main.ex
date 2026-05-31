@@ -14,7 +14,8 @@ defmodule Server do
 
   defp loop(socket) do
     case :gen_udp.recv(socket, 512) do
-      {:ok, {address, port, _data}} ->
+      {:ok, {address, port, _data} = request} ->
+        IO.inspect(request, label: "TST")
         response = ""
         :gen_udp.send(socket, address, port, response)
         loop(socket)
