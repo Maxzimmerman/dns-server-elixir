@@ -1,6 +1,21 @@
 defmodule MessageHead do
   defstruct [:id, :qr, :opcode, :aa, :tc, :rd, :ra, :z, :rcode, :ancount, :nscount, :arcount]
 
+  @type t :: %__MODULE__{
+          id: binary(),
+          qr: binary(),
+          opcode: binary(),
+          aa: binary(),
+          tc: binary(),
+          rd: binary(),
+          ra: binary(),
+          z: binary(),
+          rcode: binary(),
+          ancount: binary(),
+          nscount: binary(),
+          arcount: binary()
+        }
+
   def to_struct(input_map) do
     %MessageHead{
       id: input_map.id,
