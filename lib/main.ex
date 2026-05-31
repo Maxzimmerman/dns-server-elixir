@@ -14,10 +14,11 @@ defmodule Server do
 
   defp loop(socket) do
     case :gen_udp.recv(socket, 512) do
-      {:ok, {address, port, _data} = request} ->
+      {:ok, {address, port, data} = request} ->
         IO.inspect(request, label: "TST")
         IO.inspect(address, label: "Address")
         IO.inspect(port, label: "PORT")
+        IO.inspect(data, label: "DATA")
         response = ""
         :gen_udp.send(socket, address, port, response)
         loop(socket)
