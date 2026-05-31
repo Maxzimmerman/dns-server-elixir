@@ -37,7 +37,7 @@ defmodule Server do
 
     header = %MessageHead{
       id: id,
-      qr: qr,
+      qr: 1,
       opcode: opcode,
       aa: aa,
       tc: tc,
@@ -45,8 +45,8 @@ defmodule Server do
       ra: ra,
       z: z,
       rcode: rcode,
-      qdcount: qdcount,
-      ancount: ancount,
+      qdcount: 1,
+      ancount: 1,
       nscount: nscount,
       arcount: arcount
     }

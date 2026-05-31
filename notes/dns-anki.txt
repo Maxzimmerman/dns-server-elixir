@@ -1,0 +1,53 @@
+#separator:tab
+#html:false
+#tags column:3
+What is a bitstring in Elixir?	A sequence of bits between << and >>. May or may not be a whole number of bytes.	elixir binary
+What is a binary in Elixir?	A bitstring whose length is a multiple of 8 bits (i.e. byte-aligned).	elixir binary
+What does :gen_udp.send require: a binary or a bitstring?	A binary (byte-aligned). Bitstrings cause "Bad value on output port 'udp_inet'".	elixir binary udp
+In Elixir, what does ::N mean for an integer segment?	N bits. So 1::16 is 16 bits = 2 bytes, 1::4 is 4 bits.	elixir binary
+In Elixir, what does ::N mean for a binary segment? (e.g. "io"::binary-size(2))	N bytes.	elixir binary
+What is the default byte order for integer segments in Elixir binaries?	Big-endian.	elixir binary
+How do you write a 1-byte unsigned integer in an Elixir binary literal?	<<n>> or <<n::8>>.	elixir binary
+How do you write a 2-byte big-endian integer in an Elixir binary?	<<n::16>>.	elixir binary
+How do you write a 4-byte big-endian integer in an Elixir binary?	<<n::32>>.	elixir binary
+How do you take N raw bytes off the front of a binary while parsing?	<<chunk::binary-size(N), rest::binary>> = bin	elixir binary parsing
+How do you capture all remaining bytes when pattern-matching a binary?	rest::binary at the end of the pattern.	elixir binary parsing
+What happens if you pattern-match a binary without rest::binary at the end?	Elixir requires the binary to be exactly the size of your fixed fields, so longer inputs fail to match.	elixir binary parsing
+What does the error "construction of binary failed... is not a multiple of the unit" mean?	Your <<...>> literal totals a number of bits that isn't divisible by 8. Usually ::N where you meant ::N*8.	elixir errors
+What does the error "Bad value on output port 'udp_inet'" mean?	You tried to send something that isn't a proper binary (often a bitstring whose bits aren't byte-aligned).	elixir errors udp
+What does "no match of right hand side value" mean when parsing a binary?	The pattern doesn't fit the data. Print byte_size and inspect the first few bytes; usually a field size is wrong or rest::binary is missing.	elixir errors
+How many bytes is a DNS header?	Always 12 bytes.	dns
+What are the 5 sections of a DNS message?	Header, Question, Answer, Authority, Additional.	dns
+What is the QR bit in the DNS header?	1 bit. 0 = query, 1 = response.	dns header
+What is OPCODE in the DNS header?	4-bit field, kind of query. 0 = standard query.	dns header
+What is RD in the DNS header?	1-bit "Recursion Desired" flag. Client sets it to ask the server to resolve recursively.	dns header
+What is RA in the DNS header?	1-bit "Recursion Available" flag. Server sets it to indicate it supports recursion.	dns header
+What is AA in the DNS header?	1-bit "Authoritative Answer" flag. Set when the responder owns the queried domain.	dns header
+What is TC in the DNS header?	1-bit "Truncated" flag. Set when the message exceeded 512 bytes.	dns header
+What is RCODE in the DNS header?	4-bit response code. 0 = no error, 1 = format error, 2 = server failure, 3 = name error, etc.	dns header
+What are QDCOUNT, ANCOUNT, NSCOUNT, ARCOUNT?	16-bit counts of records in the Question, Answer, Authority, Additional sections respectively.	dns header
+What does the DNS header look like in bit-segment Elixir form?	<<id::16, qr::1, opcode::4, aa::1, tc::1, rd::1, ra::1, z::3, rcode::4, qdcount::16, ancount::16, nscount::16, arcount::16, rest::binary>>	dns elixir
+How is a DNS domain name encoded?	As a sequence of labels. Each label = 1-byte length + that many ASCII bytes. Terminated by a 0x00 byte.	dns name
+How is "codecrafters.io" encoded as bytes?	0c 63 6f 64 65 63 72 61 66 74 65 72 73  02 69 6f  00 (12 codecrafters 2 io null)	dns name
+What is the maximum length of a single DNS label?	63 bytes. (Lengths 64+ use the top 2 bits for compression pointers.)	dns name
+How do you detect a DNS compression pointer when parsing a label?	The first 2 bits are 11 (i.e. the byte is >= 0xC0). The remaining 14 bits are the byte offset from the start of the packet.	dns compression
+What's the Elixir pattern that matches a DNS compression pointer?	<<0b11::2, offset::14, rest::binary>>	dns compression elixir
+When parsing names with compression, what do you need to keep in scope?	The whole original packet — pointers reference absolute offsets from the start, not from the current cursor.	dns compression
+What are the fields of a DNS question section?	NAME (label sequence), TYPE (16 bits), CLASS (16 bits).	dns question
+What does TYPE = 1 mean in DNS?	A record (IPv4 address).	dns
+What does CLASS = 1 mean in DNS?	IN (Internet) class. Almost always 1 in practice.	dns
+What are the fields of a DNS answer record?	NAME, TYPE (16), CLASS (16), TTL (32), RDLENGTH (16), RDATA (RDLENGTH bytes).	dns answer
+For an A record, what is the format of RDATA?	A 4-byte big-endian integer representing the IPv4 address (one byte per octet).	dns answer
+What is the role of the ID field in DNS?	A 16-bit identifier set by the client and copied verbatim into the response so the client can match replies to its in-flight queries.	dns header
+Why does a DNS reply include the question section?	UDP is connectionless, so the client echoes the question back to let the requester match the response to a specific outgoing query.	dns
+What does dig flag +noedns do and why use it for codecrafters?	Disables EDNS, which avoids dig adding an OPT record to the additional section that an early DNS implementation wouldn't know how to parse.	dns dig
+What dig command tests a local DNS server on port 2053?	dig @127.0.0.1 -p 2053 +noedns codecrafters.io.	dns dig
+How do you concatenate two binaries in Elixir?	binary1 <> binary2	elixir
+How do you inspect a binary as hex in Elixir?	IO.inspect(bin, base: :hex)	elixir debug
+How do you get the byte length of a binary?	byte_size(bin)	elixir
+How do you get the bit length of a bitstring?	bit_size(bin)	elixir
+What's the Elixir pattern to parse the first 2 bytes as an int and keep the rest?	<<n::16, rest::binary>> = bin	elixir binary parsing
+What's a good recursion pattern for parsing variable-length label sequences in Elixir?	Two function heads: one matches the 0 terminator and returns, the other matches <<len, label::binary-size(len), rest::binary>> and recurses.	elixir dns
+How is recursive DNS resolution gated in a query?	By the RD (Recursion Desired) bit in the header. RD=1 asks the server to recurse; RD=0 asks for a direct answer.	dns
+In "codecrafters.io", which label is higher in the hierarchy?	io. The rightmost label is closest to the root; codecrafters is a child of io.	dns
+What is the implicit final label of every fully-qualified domain name?	The root ("."), represented on the wire by the trailing 0x00 byte.	dns
