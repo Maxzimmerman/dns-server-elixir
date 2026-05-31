@@ -36,10 +36,10 @@ defmodule Server do
         }
 
         IO.inspect(header_map)
-        IO.inspect(MessageHead.to_struct(header_map), label: "TST STRUCT")
+        header = MessageHead.to_struct(header_map)
 
         IO.inspect(id, label: "TEST id")
-        message = build_message(header(), question(), answer())
+        message = build_message(header, question(), answer())
 
         response = message.header <> message.question <> message.answer
 

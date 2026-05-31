@@ -32,4 +32,9 @@ defmodule MessageHead do
       arcount: input_map.arcount
     }
   end
+
+  def to_binary_str(%MessageHead{} = head),
+    do:
+      <<head.id::4, head.qr, head.opcode, head.aa, head.tc, head.rd, head.ra, head.z, head.rcode,
+        head.ancount, head.nscount, head.arcount>>
 end
