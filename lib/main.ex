@@ -35,10 +35,11 @@ defmodule Server do
     <<id::16, qr::1, opcode::4, aa::1, tc::1, rd::1, ra::1, z::3, rcode::4, qdcount::16,
       ancount::16, nscount::16, arcount::16, rest::binary>> = data
 
+    # transfor header to answer type 
     header = %MessageHead{
       id: id,
       qr: 1,
-      opcode: opcode,
+      opcode: if(opcode == 0, do: 0, else: 4),
       aa: aa,
       tc: tc,
       rd: rd,
