@@ -19,8 +19,16 @@ defmodule Server do
         IO.inspect(address, label: "Address")
         IO.inspect(port, label: "PORT")
         IO.inspect(data, label: "DATA")
+
+        header =
+          <<1234::16, 1::1, 0::4, 0::1, 0::1, 0::1, 0::1, 0::3, 0::4, 0::16, 0::16, 0::16, 0::16>>
+
+        message = %Message{header: header}
+        IO.inspect(message, label: "message")
+
         response =
           <<1234::16, 1::1, 0::4, 0::1, 0::1, 0::1, 0::1, 0::3, 0::4, 0::16, 0::16, 0::16, 0::16>>
+
         IO.inspect(response, label: "TS")
         :gen_udp.send(socket, address, port, response)
         loop(socket)
