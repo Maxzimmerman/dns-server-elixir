@@ -16,7 +16,7 @@ defmodule Server do
     case :gen_udp.recv(socket, 512) do
       {:ok, {address, port, data}} ->
         IO.inspect(data, label: "TEST DATA")
-        <<id::16>> = data
+        <<id::16, rest::binary>> = data
         IO.inspect(id, label: "TEST id")
         message = build_message(header(), question(), answer())
 
