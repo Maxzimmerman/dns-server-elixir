@@ -17,28 +17,10 @@ defmodule Server do
       {:ok, {address, port, data}} ->
         IO.inspect(data, label: "TEST DATA")
 
-        <<id::16, qr::1, opcode::4, aa::1, tc::1, rd::1, ra::1, z::3, rcode::4, ancount::16,
-          nscount::16, arcount::16, _rest::binary>> = data
+        %{header: header, rest: rest} = extract_header_bites_and_return_rest(data)
 
-        header_map = %{
-          id: id,
-          qr: qr,
-          opcode: opcode,
-          aa: aa,
-          tc: tc,
-          rd: rd,
-          ra: ra,
-          z: z,
-          rcode: rcode,
-          ancount: ancount,
-          nscount: nscount,
-          arcount: arcount
-        }
+        IO.inspect(header, label: "TST HEADER")
 
-        IO.inspect(header_map)
-        header = MessageHead.to_struct(header_map)
-
-        IO.inspect(id, label: "TEST id")
         message = build_message(header, question(), answer())
 
         response = message.header <> message.question <> message.answer
@@ -52,7 +34,29 @@ defmodule Server do
     end
   end
 
-  defp build_message(header, question, answer) do
+  defp extract_header_bites_and_return_rest(data) do
+    <<id::16, qr::1, opcode::4, aa::1, tc::1, rd::1, ra::1, z::3, rcode::4, ancount::16,
+      nscount::16, arcount::16, rest::binary>> = data
+
+    header = %MessageHead{
+      id: id,
+      qr: qr,
+      opcode: opcode,
+      aa: aa,
+      tc: tc,
+      rd: rd,
+      ra: ra,
+      z: z,
+      rcode: rcode,
+      ancount: ancount,
+      nscount: nscount,
+      arcount: arcount
+    }
+
+    %{header: header, rest: rest}
+  end
+
+  defp build_message(%MessageHead{} = header, question, answer) do
     %Message{header: header, question: question, answer: answer}
   end
 
