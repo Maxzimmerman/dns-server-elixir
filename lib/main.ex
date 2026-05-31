@@ -17,7 +17,7 @@ defmodule Server do
       {:ok, {address, port, data}} ->
         message = build_message(header(), question(), answer())
 
-        response = message.header <> message.question
+        response = message.header <> message.question <> message.answer
 
         IO.inspect(response, label: "TS")
         :gen_udp.send(socket, address, port, response)
