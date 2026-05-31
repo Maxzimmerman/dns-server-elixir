@@ -3,7 +3,7 @@ defmodule MessageHead do
 
   def to_struct(input_map) do
     %MessageHead{
-      id: input_map["id"],
+      id: input_map.id,
       qr: input_map["qr"],
       opcode: input_map["opcode"],
       aa: input_map["aa"],
