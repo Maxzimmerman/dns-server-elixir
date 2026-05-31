@@ -17,7 +17,7 @@ defmodule Server do
       {:ok, {address, port, data}} ->
         message = build_message(header())
         IO.inspect(data, label: "TEST as binaries")
-        IO.inspect(Base.encode64(data), label: "TEST as strings")
+        IO.inspect(Base.encode16(data), label: "TEST as strings")
 
         response = message.header
 
