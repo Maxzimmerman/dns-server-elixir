@@ -15,11 +15,6 @@ defmodule Server do
   defp loop(socket) do
     case :gen_udp.recv(socket, 512) do
       {:ok, {address, port, data} = request} ->
-        IO.inspect(request, label: "TST")
-        IO.inspect(address, label: "Address")
-        IO.inspect(port, label: "PORT")
-        IO.inspect(data, label: "DATA")
-
         header =
           <<1234::16, 1::1, 0::4, 0::1, 0::1, 0::1, 0::1, 0::3, 0::4, 0::16, 0::16, 0::16, 0::16>>
 
@@ -36,6 +31,9 @@ defmodule Server do
       {:error, reason} ->
         IO.puts("Error receiving data: #{inspect(reason)}")
     end
+  end
+
+  defp build_message(header) do
   end
 
   def main(_args) do
