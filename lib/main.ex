@@ -22,6 +22,7 @@ defmodule Server do
         IO.inspect(header, label: "TST HEADER")
 
         message = build_message(header, question(), answer())
+        IO.inspect(message, label: "TEST MESSAGE")
 
         response = MessageHead.to_binary_str(message.header) <> message.question <> message.answer
 
