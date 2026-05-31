@@ -20,7 +20,7 @@ defmodule Server do
         IO.inspect(port, label: "PORT")
         IO.inspect(data, label: "DATA")
         response = <<1234, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0>>
-        IO.inspect(response)
+        IO.inspect(response, label: "TS")
         :gen_udp.send(socket, address, port, response)
         loop(socket)
 
