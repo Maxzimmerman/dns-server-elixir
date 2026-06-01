@@ -17,11 +17,9 @@ defmodule Server do
       {:ok, {address, port, data}} ->
         %{header: header, rest: rest} = extract_header_bites_and_return_rest(data)
         IO.inspect(rest, label: "Test rest")
-        <<length::8, rest::binary>> = rest
-        <<first_domain::binary-size(length), rest::binary>> = rest
-        IO.inspect(first_domain)
-
+        {labels, rest} = parse_labels(rest, [])
         message = build_message(header, question(), answer())
+        IO.inspect(labels, label: "TEST LABELS")
 
         response = MessageHead.to_binary_str(message.header) <> message.question <> message.answer
 
@@ -31,6 +29,12 @@ defmodule Server do
       {:error, reason} ->
         IO.puts("Error receiving data: #{inspect(reason)}")
     end
+  end
+
+  def parse_labels(<<0, rest::binary>>, labels), do: {Enum.reverse(labels), rest}
+
+  def parse_labels(<<length::8, label::binary-size(length), rest::binary>>, labels) do
+    parse_labels(rest, [label | labels])
   end
 
   defp extract_header_bites_and_return_rest(data) do
