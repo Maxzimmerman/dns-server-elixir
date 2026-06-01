@@ -16,14 +16,12 @@ defmodule Server do
     case :gen_udp.recv(socket, 512) do
       {:ok, {address, port, data}} ->
         %{header: header, rest: rest} = extract_header_bites_and_return_rest(data)
-        IO.inspect(rest, label: "Test rest")
         {labels, _rest} = parse_labels(rest, [])
         message = build_message(header, question(), answer())
-        IO.inspect(labels, label: "TEST LABELS")
-        labels_response = build_question_block(labels, "")
-        IO.inspect(labels_response, label: "TEST RESP")
+        question = build_question(labels)
+        answer = build_answer(labels)
 
-        response = MessageHead.to_binary_str(message.header) <> labels_response <> message.answer
+        response = MessageHead.to_binary_str(message.header) <> question <> answer
 
         :gen_udp.send(socket, address, port, response)
         loop(socket)
@@ -33,17 +31,14 @@ defmodule Server do
     end
   end
 
-  def parse_labels(<<0, rest::binary>>, labels), do: {Enum.reverse(labels), rest}
+  defp encode_name([]), do: <<0>>
+  defp encode_name([label | rest]), do: <<byte_size(label), label::binary>> <> encode_name(rest)
 
-  def parse_labels(<<length::8, label::binary-size(length), rest::binary>>, labels) do
-    parse_labels(rest, [label | labels])
-  end
+  defp build_question(labels),
+    do: encode_name(labels) <> <<1::16, 1::16>>
 
-  def build_question_block([], block), do: block <> <<0, 1::16, 1::16>>
-
-  def build_question_block([head | tail], block) do
-    build_question_block(tail, block <> <<byte_size(head), head::binary>>)
-  end
+  defp build_answer(labels),
+    do: encode_name(labels) <> <<1::16, 1::16, 60::32, 4::16, 8, 8, 8, 8>>
 
   defp extract_header_bites_and_return_rest(data) do
     <<id::16, _qr::1, opcode::4, aa::1, tc::1, rd::1, ra::1, z::3, _rcode::4, _qdcount::16,
