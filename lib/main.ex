@@ -17,7 +17,6 @@ defmodule Server do
       {:ok, {address, port, data}} ->
         IO.inspect(System.argv())
         %{header: header, rest: rest} = extract_header_bites_and_return_rest(data)
-        {labels, _rest} = parse_questions(rest, data, header.qdcount, [])
         {questions, _} = parse_questions(rest, data, header.qdcount, [])
         question_bytes = questions |> Enum.map(&build_question/1) |> Enum.join()
         answer_bytes = questions |> Enum.map(&build_answer/1) |> Enum.join()
