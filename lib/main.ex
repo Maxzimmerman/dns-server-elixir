@@ -39,7 +39,7 @@ defmodule Server do
     parse_labels(rest, [label | labels])
   end
 
-  def build_question_block([], block), do: block <> <<1::16, 1::16>>
+  def build_question_block([], block), do: block <> <<0, 1::16, 1::16>>
 
   def build_question_block([head | tail], block) do
     build_question_block(tail, block <> <<byte_size(head), head::binary, 2>>)
