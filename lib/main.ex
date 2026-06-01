@@ -78,7 +78,7 @@ defmodule Server do
       rd: rd,
       ra: ra,
       z: z,
-      rcode: opcode,
+      rcode: rcode,
       qdcount: qdcount,
       ancount: ancount,
       nscount: nscount,
