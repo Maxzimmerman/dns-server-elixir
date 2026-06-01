@@ -23,7 +23,7 @@ defmodule Server do
         {questions, _} = parse_questions(rest, data, header.qdcount, [])
         question_bytes = questions |> Enum.map(&build_question/1) |> Enum.join()
         answer_bytes = questions |> Enum.map(&build_answer/1) |> Enum.join()
-        message = build_message(header, question_bytes, answer_bytes)
+        message = build_message(header, question_bytes, answer_bytes, questions)
         IO.inspect(message)
 
         response = MessageHead.to_binary_str(message.header) <> message.question <> message.answer
@@ -91,8 +91,16 @@ defmodule Server do
     %{header: header, rest: rest}
   end
 
-  defp build_message(%MessageHead{} = header, question, answer) do
-    %Message{header: header, question: question, answer: answer}
+  defp build_message(%MessageHead{} = header, question, answer, questions) do
+    response_header = %MessageHead{
+      header
+      | qr: 1,
+        qdcount: length(questions),
+        ancount: length(questions),
+        rcode: if(header.opcode == 0, do: 0, else: 4)
+    }
+
+    %Message{header: response_header, question: question, answer: answer}
   end
 
   def header,
