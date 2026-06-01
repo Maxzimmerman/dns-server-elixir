@@ -17,7 +17,7 @@ defmodule Server do
       {:ok, {address, port, data}} ->
         %{header: header, rest: rest} = extract_header_bites_and_return_rest(data)
         IO.inspect(Base.encode64(rest), label: "Test rest")
-        <<length::32, _rest::binary>> = rest
+        <<domain::32, type::2, class::2, _rest::binary>> = rest
         IO.inspect(length)
 
         message = build_message(header, question(), answer())
