@@ -38,7 +38,7 @@ defmodule Server do
           IO.inspect(address)
           IO.puts(port)
           IO.puts("to another server")
-          :gen_udp.send(socket, server_ip, server_port, response)
+          :gen_udp.send(socket, server_ip, String.to_integer(server_port), response)
         else
           :gen_udp.send(socket, address, port, response)
         end
