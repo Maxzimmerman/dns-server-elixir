@@ -17,6 +17,8 @@ defmodule Server do
       {:ok, {address, port, data}} ->
         %{header: header, rest: rest} = extract_header_bites_and_return_rest(data)
         {labels, _rest} = parse_labels(rest, [])
+        IO.inspect(rest, label: "TS REST")
+        IO.inspect(labels, label: "TS Labels")
         question = build_question(labels)
         answer = build_answer(labels)
         message = build_message(header, question, answer)
