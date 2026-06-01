@@ -16,7 +16,7 @@ defmodule Server do
     case :gen_udp.recv(socket, 512) do
       {:ok, {address, port, data}} ->
         %{header: header, rest: rest} = extract_header_bites_and_return_rest(data)
-        {labels, _rest} = parse_labels(rest, [])
+        {labels, _rest} = encode_name(rest, [])
         message = build_message(header, question(), answer())
         question = build_question(labels)
         answer = build_answer(labels)
