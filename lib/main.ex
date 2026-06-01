@@ -16,7 +16,7 @@ defmodule Server do
     case :gen_udp.recv(socket, 512) do
       {:ok, {address, port, data}} ->
         %{header: header, rest: rest} = extract_header_bites_and_return_rest(data)
-        {labels, _rest} = parse_questions(rest, data, [])
+        {labels, _rest} = parse_questions(rest, data, header.qdcount, [])
         IO.inspect(rest, label: "TS REST")
         IO.inspect(labels, label: "TS Labels")
         question = build_question(labels)
