@@ -36,7 +36,7 @@ defmodule Server do
   def parse_labels(<<0, rest::binary>>, packet, labels), do: {Enum.reverse(labels), rest}
 
   def parse_labels(<<0b11::2, offset::14, rest::binary>>, packet, labels) do
-    <<_skip::binary-size(offset), at_offset::binary>> = rest
+    <<_skip::binary-size(offset), at_offset::binary>> = packet
     {pointed_labels, _} = parse_labels(at_offset, packet, [])
     {Enum.reverse(labels) ++ pointed_labels, rest}
   end
