@@ -20,6 +20,8 @@ defmodule Server do
         {labels, _rest} = parse_labels(rest, [])
         message = build_message(header, question(), answer())
         IO.inspect(labels, label: "TEST LABELS")
+        labels_response = build_question_block(labels, <<>>)
+        IO.inspect(labels_response, label: "TEST RESP")
 
         response = MessageHead.to_binary_str(message.header) <> message.question <> message.answer
 
@@ -35,6 +37,12 @@ defmodule Server do
 
   def parse_labels(<<length::8, label::binary-size(length), rest::binary>>, labels) do
     parse_labels(rest, [label | labels])
+  end
+
+  def build_question_block([], block), do: block <> <<1::16, 1::16>>
+
+  def build_question_block([head | tail], block) do
+    build_question_block(tail, block <> <<byte_size(head), head, 2>>)
   end
 
   defp extract_header_bites_and_return_rest(data) do
