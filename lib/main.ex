@@ -16,7 +16,7 @@ defmodule Server do
     case :gen_udp.recv(socket, 512) do
       {:ok, {address, port, data}} ->
         %{header: header, rest: rest} = extract_header_bites_and_return_rest(data)
-        {labels, _rest} = encode_name(rest, [])
+        {labels, _rest} = parse_labels(rest, [])
         message = build_message(header, question(), answer())
         question = build_question(labels)
         answer = build_answer(labels)
@@ -30,6 +30,14 @@ defmodule Server do
         IO.puts("Error receiving data: #{inspect(reason)}")
     end
   end
+
+  def parse_labels(<<0, rest::binary>>, labels), do: {Enum.reverse(labels), rest}
+
+  def parse_labels(<<length::8, label::binary-size(length), rest::binary>>, labels) do
+    parse_labels(rest, [label | labels])
+  end
+
+  def build_question_block([], block), do: block <> <<0, 1::16, 1::16>>
 
   defp encode_name([]), do: <<0>>
   defp encode_name([label | rest]), do: <<byte_size(label), label::binary>> <> encode_name(rest)
