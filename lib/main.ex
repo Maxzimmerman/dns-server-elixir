@@ -30,7 +30,7 @@ defmodule Server do
           [server_ip, server_port] = String.split(server_address, ":")
           IO.puts(server_ip)
           IO.puts(server_port)
-          IO.puts(address)
+          IO.inspect(address)
           IO.puts(port)
           IO.puts("to another server")
           :gen_udp.send(socket, address, port, response)
