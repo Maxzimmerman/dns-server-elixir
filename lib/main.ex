@@ -42,7 +42,7 @@ defmodule Server do
   def build_question_block([], block), do: block <> <<0, 1::16, 1::16>>
 
   def build_question_block([head | tail], block) do
-    build_question_block(tail, block <> <<byte_size(head), head::binary, 2>>)
+    build_question_block(tail, block <> <<byte_size(head), head::binary>>)
   end
 
   defp extract_header_bites_and_return_rest(data) do
