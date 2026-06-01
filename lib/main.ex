@@ -17,11 +17,11 @@ defmodule Server do
       {:ok, {address, port, data}} ->
         %{header: header, rest: rest} = extract_header_bites_and_return_rest(data)
         {labels, _rest} = parse_labels(rest, [])
-        message = build_message(header, question(), answer())
         question = build_question(labels)
         answer = build_answer(labels)
+        message = build_message(header, question, answer)
 
-        response = MessageHead.to_binary_str(message.header) <> question <> answer
+        response = MessageHead.to_binary_str(message.header) <> message.question <> message.answer
 
         :gen_udp.send(socket, address, port, response)
         loop(socket)
