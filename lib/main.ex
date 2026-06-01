@@ -33,6 +33,10 @@ defmodule Server do
 
   def parse_labels(<<0, rest::binary>>, labels), do: {Enum.reverse(labels), rest}
 
+  def parse_labels(<<0b11::2, offset::14, rest::binary>>, labels) do
+    IO.puts("FOUND")
+  end
+
   def parse_labels(<<length::8, label::binary-size(length), rest::binary>>, labels) do
     parse_labels(rest, [label | labels])
   end
