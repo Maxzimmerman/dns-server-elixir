@@ -20,9 +20,10 @@ defmodule Server do
         {labels, _rest} = parse_questions(rest, data, header.qdcount, [])
         IO.inspect(rest, label: "TS REST")
         IO.inspect(labels, label: "TS Labels")
-        question = build_question(labels)
-        answer = build_answer(labels)
-        message = build_message(header, question, answer)
+        {questions, _} = parse_questions(rest, data, header.qdcount, [])
+        question_bytes = questions |> Enum.map(&build_question/1) |> Enum.join()
+        answer_bytes = questions |> Enum.map(&build_answer/1) |> Enum.join()
+        message = build_message(header, question_bytes, answer_bytes)
 
         response = MessageHead.to_binary_str(message.header) <> message.question <> message.answer
 
