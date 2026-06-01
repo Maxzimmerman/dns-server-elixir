@@ -15,7 +15,6 @@ defmodule Server do
   defp loop(socket) do
     case :gen_udp.recv(socket, 512) do
       {:ok, {address, port, data}} ->
-        IO.inspect(System.argv())
         %{header: header, rest: rest} = extract_header_bites_and_return_rest(data)
         {questions, _} = parse_questions(rest, data, header.qdcount, [])
         question_bytes = questions |> Enum.map(&build_question/1) |> Enum.join()
@@ -24,7 +23,13 @@ defmodule Server do
 
         response = MessageHead.to_binary_str(message.header) <> message.question <> message.answer
 
-        :gen_udp.send(socket, address, port, response)
+        IO.inspect(System.argv())
+
+        if Enum.member?(Sytem.argv(), "--resolver") do
+          IO.puts("to another server")
+          :gen_udp.send(socket, address, port, response)
+        end
+
         loop(socket)
 
       {:error, reason} ->
