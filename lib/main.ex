@@ -16,14 +16,14 @@ defmodule Server do
     case :gen_udp.recv(socket, 512) do
       {:ok, {address, port, data}} ->
         %{header: header, rest: rest} = extract_header_bites_and_return_rest(data)
+        <<length::2, domain::32, type::2, class::2, _rest::binary>> = rest
+        IO.inspect(length)
         IO.inspect(rest, label: "Test rest")
 
         message = build_message(header, question(), answer())
-        IO.inspect(message, label: "TEST MESSAGE")
 
         response = MessageHead.to_binary_str(message.header) <> message.question <> message.answer
 
-        IO.inspect(response, label: "TS")
         :gen_udp.send(socket, address, port, response)
         loop(socket)
 
