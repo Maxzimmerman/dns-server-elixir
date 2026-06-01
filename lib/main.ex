@@ -28,7 +28,7 @@ defmodule Server do
         if Enum.member?(System.argv(), "--resolver") do
           [_, server_address] = System.argv()
           [server_ip, server_port] = String.split(server_address, ":")
-          IO.puts(server_ip)
+          IO.inspect({server_ip})
           IO.puts(server_port)
           IO.inspect(address)
           IO.puts(port)
