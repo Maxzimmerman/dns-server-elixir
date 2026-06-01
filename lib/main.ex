@@ -24,6 +24,7 @@ defmodule Server do
         question_bytes = questions |> Enum.map(&build_question/1) |> Enum.join()
         answer_bytes = questions |> Enum.map(&build_answer/1) |> Enum.join()
         message = build_message(header, question_bytes, answer_bytes)
+        IO.inspect(message)
 
         response = MessageHead.to_binary_str(message.header) <> message.question <> message.answer
 
