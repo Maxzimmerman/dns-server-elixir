@@ -17,37 +17,88 @@ defmodule Server do
       {:ok, {address, port, data}} ->
         %{header: header, rest: rest} = extract_header_bites_and_return_rest(data)
         {questions, _} = parse_questions(rest, data, header.qdcount, [])
-        question_bytes = questions |> Enum.map(&build_question/1) |> Enum.join()
-        answer_bytes = questions |> Enum.map(&build_answer/1) |> Enum.join()
-        message = build_message(header, question_bytes, answer_bytes, questions)
 
+        answer_bytes =
+          case resolver() do
+            nil ->
+              questions |> Enum.map(&build_answer/1) |> Enum.join()
+
+            target ->
+              questions |> Enum.map(&forward(&1, header, socket, target)) |> Enum.join()
+          end
+
+        question_bytes = questions |> Enum.map(&build_question/1) |> Enum.join()
+        message = build_message(header, question_bytes, answer_bytes, questions)
         response = MessageHead.to_binary_str(message.header) <> message.question <> message.answer
 
-        IO.inspect(System.argv())
-
-        if Enum.member?(System.argv(), "--resolver") do
-          [_, server_address] = System.argv()
-          [server_ip, server_port] = String.split(server_address, ":")
-
-          server_ip =
-            String.split(server_ip, ".")
-            |> Enum.map(&String.to_integer(&1))
-            |> List.to_tuple()
-
-          IO.puts(server_port)
-          IO.inspect(address)
-          IO.puts(port)
-          IO.puts("to another server")
-          :gen_udp.send(socket, server_ip, String.to_integer(server_port), response)
-        else
-          :gen_udp.send(socket, address, port, response)
-        end
-
+        :gen_udp.send(socket, address, port, response)
         loop(socket)
 
       {:error, reason} ->
         IO.puts("Error receiving data: #{inspect(reason)}")
     end
+  end
+
+  defp resolver do
+    case System.argv() do
+      ["--resolver", addr] ->
+        [ip_str, port_str] = String.split(addr, ":")
+
+        ip =
+          ip_str
+          |> String.split(".")
+          |> Enum.map(&String.to_integer/1)
+          |> List.to_tuple()
+
+        {ip, String.to_integer(port_str)}
+
+      _ ->
+        nil
+    end
+  end
+
+  defp forward(labels, client_header, socket, {resolver_ip, resolver_port}) do
+    query_header = %MessageHead{
+      client_header
+      | qr: 0,
+        qdcount: 1,
+        ancount: 0,
+        nscount: 0,
+        arcount: 0
+    }
+
+    query = MessageHead.to_binary_str(query_header) <> build_question(labels)
+    :ok = :gen_udp.send(socket, resolver_ip, resolver_port, query)
+    {:ok, {_, _, reply}} = :gen_udp.recv(socket, 512)
+    extract_answer_bytes(reply)
+  end
+
+  defp extract_answer_bytes(reply) do
+    <<_id::16, _qr::1, _opcode::4, _aa::1, _tc::1, _rd::1, _ra::1, _z::3, _rcode::4,
+      qdcount::16, ancount::16, _nscount::16, _arcount::16, after_header::binary>> = reply
+
+    after_questions = skip_questions(after_header, reply, qdcount)
+    take_answers(after_questions, reply, ancount, <<>>)
+  end
+
+  defp skip_questions(rest, _packet, 0), do: rest
+
+  defp skip_questions(rest, packet, n) do
+    {_labels, after_name} = parse_labels(rest, packet, [])
+    <<_type::16, _class::16, after_q::binary>> = after_name
+    skip_questions(after_q, packet, n - 1)
+  end
+
+  defp take_answers(_rest, _packet, 0, acc), do: acc
+
+  defp take_answers(rest, packet, n, acc) do
+    {labels, after_name} = parse_labels(rest, packet, [])
+
+    <<type::16, class::16, ttl::32, rdlength::16, rdata::binary-size(rdlength),
+      after_a::binary>> = after_name
+
+    encoded = encode_name(labels) <> <<type::16, class::16, ttl::32, rdlength::16, rdata::binary>>
+    take_answers(after_a, packet, n - 1, acc <> encoded)
   end
 
   def parse_labels(<<0, rest::binary>>, _packet, labels), do: {Enum.reverse(labels), rest}
