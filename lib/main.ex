@@ -25,7 +25,7 @@ defmodule Server do
 
         IO.inspect(System.argv())
 
-        if Enum.member?(Sytem.argv(), "--resolver") do
+        if Enum.member?(System.argv(), "--resolver") do
           IO.puts("to another server")
           :gen_udp.send(socket, address, port, response)
         end
