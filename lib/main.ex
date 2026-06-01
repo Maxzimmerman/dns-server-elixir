@@ -18,7 +18,7 @@ defmodule Server do
         %{header: header, rest: rest} = extract_header_bites_and_return_rest(data)
         IO.inspect(rest, label: "Test rest")
         <<domain::64, _rest::binary>> = rest
-        IO.inspect(domain)
+        IO.inspect(Base.encode64(domain))
 
         message = build_message(header, question(), answer())
 
