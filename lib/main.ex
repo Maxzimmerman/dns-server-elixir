@@ -16,7 +16,7 @@ defmodule Server do
     case :gen_udp.recv(socket, 512) do
       {:ok, {address, port, data}} ->
         %{header: header, rest: rest} = extract_header_bites_and_return_rest(data)
-        {labels, _rest} = parse_labels(rest, data, [])
+        {labels, _rest} = parse_questions(rest, data, [])
         IO.inspect(rest, label: "TS REST")
         IO.inspect(labels, label: "TS Labels")
         question = build_question(labels)
@@ -55,6 +55,14 @@ defmodule Server do
 
   defp build_answer(labels),
     do: encode_name(labels) <> <<1::16, 1::16, 60::32, 4::16, 8, 8, 8, 8>>
+
+  defp parse_questions(rest, _packet, 0, acc), do: {Enum.reverse(acc), rest}
+
+  defp parse_questions(rest, packet, n, acc) do
+    {labels, after_name} = parse_labels(rest, packet, [])
+    <<_type::16, _class::16, after_q::binary>> = after_name
+    parse_questions(after_q, packet, n - 1, [labels | acc])
+  end
 
   defp extract_header_bites_and_return_rest(data) do
     <<id::16, _qr::1, opcode::4, aa::1, tc::1, rd::1, ra::1, z::3, _rcode::4, _qdcount::16,
