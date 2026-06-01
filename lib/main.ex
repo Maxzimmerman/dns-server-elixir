@@ -40,7 +40,7 @@ defmodule Server do
     parse_labels(rest, labels)
   end
 
-  def parse_labels(<<length::8, label::binary-size(length), rest::binary>>, labels) do
+  def parse_labels(<<length, label::binary-size(length), rest::binary>>, labels) do
     parse_labels(rest, [label | labels])
   end
 
