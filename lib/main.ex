@@ -103,10 +103,10 @@ defmodule Server do
   def header,
     do: <<1234::16, 1::1, 0::4, 0::1, 0::1, 0::1, 0::1, 0::3, 0::4, 1::16, 1::16, 0::16, 0::16>>
 
-  defp question,
+  def question,
     do: <<12, "codecrafters", 2, "io", 0, 1::16, 1::16>>
 
-  defp answer,
+  def answer,
     do: <<12, "codecrafters", 2, "io", 0, 1::16, 1::16, 60::32, 4::16, 1234::32>>
 
   def main(_args) do
