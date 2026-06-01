@@ -23,7 +23,7 @@ defmodule Server do
         labels_response = build_question_block(labels, <<>>)
         IO.inspect(labels_response, label: "TEST RESP")
 
-        response = MessageHead.to_binary_str(message.header) <> message.question <> message.answer
+        response = MessageHead.to_binary_str(message.header) <> labels_response <> message.answer
 
         :gen_udp.send(socket, address, port, response)
         loop(socket)
