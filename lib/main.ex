@@ -16,7 +16,7 @@ defmodule Server do
     case :gen_udp.recv(socket, 512) do
       {:ok, {address, port, data}} ->
         %{header: header, rest: rest} = extract_header_bites_and_return_rest(data)
-        {labels, _rest} = parse_labels(rest, [])
+        {labels, _rest} = parse_labels(rest, data, [])
         IO.inspect(rest, label: "TS REST")
         IO.inspect(labels, label: "TS Labels")
         question = build_question(labels)
@@ -33,15 +33,16 @@ defmodule Server do
     end
   end
 
-  def parse_labels(<<0, rest::binary>>, labels), do: {Enum.reverse(labels), rest}
+  def parse_labels(<<0, rest::binary>>, packet, labels), do: {Enum.reverse(labels), rest}
 
-  def parse_labels(<<0b11::2, offset::14, rest::binary>>, labels) do
-    IO.puts("FOUNDS ON")
-    parse_labels(rest, labels)
+  def parse_labels(<<0b11::2, offset::14, rest::binary>>, packet, labels) do
+    <<_skip::binary-size(offset), at_offset::binary>> = rest
+    {pointed_labels, _} = parse_labels(at_offset, packet, [])
+    {Enum.reverse(labels) ++ pointed_labels, rest}
   end
 
-  def parse_labels(<<length, label::binary-size(length), rest::binary>>, labels) do
-    parse_labels(rest, [label | labels])
+  def parse_labels(<<length, label::binary-size(length), rest::binary>>, packet, labels) do
+    parse_labels(rest, packet, [label | labels])
   end
 
   def build_question_block([], block), do: block <> <<0, 1::16, 1::16>>
