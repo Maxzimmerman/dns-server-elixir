@@ -17,8 +17,9 @@ defmodule Server do
       {:ok, {address, port, data}} ->
         %{header: header, rest: rest} = extract_header_bites_and_return_rest(data)
         IO.inspect(rest, label: "Test rest")
-        <<length::8, _rest::binary>> = rest
-        IO.inspect(length)
+        <<length::8, rest::binary>> = rest
+        <<first_domain::binary-size(length), rest::binary>> = rest
+        IO.inspect(first_domain)
 
         message = build_message(header, question(), answer())
 
