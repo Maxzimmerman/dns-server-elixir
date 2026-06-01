@@ -27,9 +27,11 @@ defmodule Server do
 
         if Enum.member?(System.argv(), "--resolver") do
           [_, server_address] = System.argv()
-          [ip, server_port] = String.split(server_address, ":")
-          IO.puts(ip)
+          [server_ip, server_port] = String.split(server_address, ":")
+          IO.puts(server_ip)
           IO.puts(server_port)
+          IO.puts(address)
+          IO.puts(port)
           IO.puts("to another server")
           :gen_udp.send(socket, address, port, response)
         end
