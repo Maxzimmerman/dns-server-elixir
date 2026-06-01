@@ -32,7 +32,7 @@ defmodule Server do
     end
   end
 
-  def parse_labels(<<0, rest::binary>>, packet, labels), do: {Enum.reverse(labels), rest}
+  def parse_labels(<<0, rest::binary>>, _packet, labels), do: {Enum.reverse(labels), rest}
 
   def parse_labels(<<0b11::2, offset::14, rest::binary>>, packet, labels) do
     <<_skip::binary-size(offset), at_offset::binary>> = packet
