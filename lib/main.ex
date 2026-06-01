@@ -16,7 +16,7 @@ defmodule Server do
     case :gen_udp.recv(socket, 512) do
       {:ok, {address, port, data}} ->
         %{header: header, rest: rest} = extract_header_bites_and_return_rest(data)
-        <<length::2, domain::32, type::2, class::2, _rest::binary>> = rest
+        <<length::2, _rest::binary>> = rest
         IO.inspect(length)
         IO.inspect(rest, label: "Test rest")
 
