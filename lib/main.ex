@@ -16,9 +16,9 @@ defmodule Server do
     case :gen_udp.recv(socket, 512) do
       {:ok, {address, port, data}} ->
         %{header: header, rest: rest} = extract_header_bites_and_return_rest(data)
-        <<length::1, _rest::binary>> = rest
-        IO.inspect(length)
         IO.inspect(rest, label: "Test rest")
+        <<length::32, _rest::binary>> = rest
+        IO.inspect(length)
 
         message = build_message(header, question(), answer())
 
