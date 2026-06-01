@@ -20,7 +20,7 @@ defmodule Server do
         {labels, _rest} = parse_labels(rest, [])
         message = build_message(header, question(), answer())
         IO.inspect(labels, label: "TEST LABELS")
-        labels_response = build_question_block(labels, <<>>)
+        labels_response = build_question_block(labels, "")
         IO.inspect(labels_response, label: "TEST RESP")
 
         response = MessageHead.to_binary_str(message.header) <> labels_response <> message.answer
