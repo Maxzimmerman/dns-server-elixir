@@ -38,7 +38,7 @@ defmodule Server do
   end
 
   defp extract_header_bites_and_return_rest(data) do
-    <<id::16, qr::1, opcode::4, aa::1, tc::1, rd::1, ra::1, z::3, rcode::4, qdcount::16,
+    <<id::16, qr::1, opcode::4, aa::1, tc::1, rd::1, ra::1, z::3, _rcode::4, qdcount::16,
       _ancount::16, nscount::16, arcount::16, rest::binary>> = data
 
     # transfor header to answer type 
@@ -65,7 +65,7 @@ defmodule Server do
     %Message{header: header, question: question, answer: answer}
   end
 
-  defp header,
+  def header,
     do: <<1234::16, 1::1, 0::4, 0::1, 0::1, 0::1, 0::1, 0::3, 0::4, 1::16, 1::16, 0::16, 0::16>>
 
   defp question,
