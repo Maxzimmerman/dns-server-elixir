@@ -32,6 +32,7 @@ defmodule Server do
         response = MessageHead.to_binary_str(message.header) <> message.question <> message.answer
 
         IO.inspect(data, label: "input data")
+        IO.inspect(header, label: "input header")
 
         :gen_udp.send(socket, address, port, response)
         loop(socket)
