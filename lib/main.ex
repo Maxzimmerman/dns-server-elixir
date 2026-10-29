@@ -31,6 +31,8 @@ defmodule Server do
         message = build_message(header, question_bytes, answer_bytes, questions)
         response = MessageHead.to_binary_str(message.header) <> message.question <> message.answer
 
+        IO.inspect(data, label: "input data")
+
         :gen_udp.send(socket, address, port, response)
         loop(socket)
 
@@ -74,8 +76,8 @@ defmodule Server do
   end
 
   defp extract_answer_bytes(reply) do
-    <<_id::16, _qr::1, _opcode::4, _aa::1, _tc::1, _rd::1, _ra::1, _z::3, _rcode::4,
-      qdcount::16, ancount::16, _nscount::16, _arcount::16, after_header::binary>> = reply
+    <<_id::16, _qr::1, _opcode::4, _aa::1, _tc::1, _rd::1, _ra::1, _z::3, _rcode::4, qdcount::16,
+      ancount::16, _nscount::16, _arcount::16, after_header::binary>> = reply
 
     after_questions = skip_questions(after_header, reply, qdcount)
     take_answers(after_questions, reply, ancount, <<>>)
@@ -94,8 +96,8 @@ defmodule Server do
   defp take_answers(rest, packet, n, acc) do
     {labels, after_name} = parse_labels(rest, packet, [])
 
-    <<type::16, class::16, ttl::32, rdlength::16, rdata::binary-size(rdlength),
-      after_a::binary>> = after_name
+    <<type::16, class::16, ttl::32, rdlength::16, rdata::binary-size(rdlength), after_a::binary>> =
+      after_name
 
     encoded = encode_name(labels) <> <<type::16, class::16, ttl::32, rdlength::16, rdata::binary>>
     take_answers(after_a, packet, n - 1, acc <> encoded)
