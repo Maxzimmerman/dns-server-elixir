@@ -27,6 +27,7 @@ defmodule Client do
 
         IO.inspect(data, label: "input data")
         IO.inspect(header, label: "input header")
+        IO.inspect(resolver())
 
         :gen_udp.send(socket, address, port, response)
         loop(socket)
