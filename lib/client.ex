@@ -173,9 +173,4 @@ defmodule Client do
 
   def answer,
     do: <<12, "codecrafters", 2, "io", 0, 1::16, 1::16, 60::32, 4::16, 1234::32>>
-
-  def main(_args) do
-    {:ok, _pid} = Application.ensure_all_started(:codecrafters_dns_server)
-    Process.sleep(:infinity)
-  end
 end
